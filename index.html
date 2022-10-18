@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="animate.js"></script>
+    <style>
+        *{
+            padding: 0;
+            margin: 0;
+        }
+        .picturn{
+            position: relative;
+            margin: 20px auto 0;
+            width: 800px;
+            height: 562px;
+            background-color: aquamarine;
+            overflow: hidden;
+        }
+        .main ul{
+            position: absolute;
+            list-style: none;
+            width: 2400px;
+        }
+        .main li{
+            float: left;
+        }
+        .picturn img{
+            width: 800px;
+            height: 562px;
+        }
+        .leftturn,.rightturn{
+            position: absolute;
+            top:50%;
+            transform: translateY(-50%);
+            width: 40px;
+            height: 80px;
+            background-color: rgba(83, 81, 81,.3);
+            color: white;
+            font-size: 30px;
+            line-height: 80px;
+            text-align: center;
+            cursor: pointer;
+            display: none;
+        }
+        .leftturn{
+            left:0;
+        }
+        .rightturn{
+            right:0;
+        }
+        .leftturn:hover,.rightturn:hover{
+            color: rgb(106, 206, 246);
+        }
+        .circle{
+            position: absolute;
+            left:50%;
+            bottom: 20px;
+            transform: translateX(-50%);
+            height: 18px;
+        }
+        .circle ul{
+            list-style: none;
+            height: 100%;
+        }
+        .circle ul li{
+            display: inline-block;
+            height: 12px;
+            width: 12px;
+            border: 3px solid white;
+            border-radius: 50%;
+            cursor: pointer;
+            margin: 2px;
+        }
+        .current{
+            background-color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="picturn">
+        <div class="main">
+            <ul>
+                <!-- <li><img src="0.jpg" alt=""></li>-->
+            </ul>
+        </div>
+        <div class="leftturn">&lt;</div>
+        <div class="rightturn">&gt;</div>
+        <div class="circle">
+            <ul>
+                <!-- <li></li><li></li> -->
+            </ul>
+        </div>
+    </div>
+    <script>
+        var pic_width = 800;
+        var pic_arr = ['0.jpg','1.jpg','2.jpg'];
+        var picturn = document.querySelector('.picturn');
+        var picshow = document.querySelector('.main ul');
+        var circle = document.querySelector('.circle ul');
+        var leftturn = document.querySelector('.leftturn');
+        var rightturn = document.querySelector('.rightturn');
+        var active = 0;//默认序列
+        var valve = true;
+        for(var i = 0;i<pic_arr.length;i++){
+
+            var npic = document.createElement('li');
+            npic.setAttribute('index',i);
+            npic.innerHTML = `<img src="${pic_arr[i]}" alt="">`;
+            picshow.appendChild(npic);
+
+            var ncus = document.createElement('li');
+            ncus.setAttribute('index',i);
+            ncus.className = 'round';
+            circle.appendChild(ncus);
+        }
+        picturn.addEventListener('mouseover',()=>{
+            leftturn.style.display = 'block';
+            rightturn.style.display = 'block';
+        });
+        picturn.addEventListener('mouseout',()=>{
+            leftturn.style.display = 'none';
+            rightturn.style.display = 'none';
+        });
+
+        circle.querySelectorAll('li')[active].className = 'round current';
+        //初始化结束
+
+        circle.addEventListener('click',function(e){
+            if(e.target.className == 'round'){
+                var wiiindex = e.target.getAttribute('index');
+                if (valve) change(wiiindex);
+            }
+        });
+
+        rightturn.addEventListener('click',function(e){
+            var wiiindex = Number(circle.querySelector('.current').getAttribute('index')) + 1;
+            wiiindex = wiiindex==circle.querySelectorAll('li').length?0:wiiindex;
+            if (valve) change(wiiindex);
+            // console.log(wiiindex);
+        });
+
+        leftturn.addEventListener('click',function(e){
+            var wiiindex = Number(circle.querySelector('.current').getAttribute('index')) - 1;
+            wiiindex = wiiindex==-1?circle.querySelectorAll('li').length-1:wiiindex;
+            if (valve) change(wiiindex);
+            // console.log(wiiindex);
+        });
+
+        function change(index){
+            valve = false;
+            var lis = circle.querySelectorAll('li');
+            for(var item of lis){
+                item.className = 'round';
+            }
+            lis[index].className = 'round current';
+            active = index;
+            console.log(active);
+            animate(picshow,-pic_width*index,()=>valve = true);
+        }
+
+        var autochange = setInterval(() => rightturn.click(),2000);//autochange
+
+        picturn.addEventListener('mouseenter',()=>{
+            clearInterval(autochange);
+        });
+        picturn.addEventListener('mouseleave',()=>{
+            autochange = setInterval(() => rightturn.click(),2000);
+        });
+    </script>
+</body>
+</html>
